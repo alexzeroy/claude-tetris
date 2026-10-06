@@ -33,7 +33,10 @@ jobs:
                SOLO puedes usar labels que ya existen en el repositorio; nunca crees labels nuevos.
                Quita con --remove-label los labels previos que ya no apliquen tras una edición.
             3. Examina el código fuente relevante (game.js, index.html, style.css) para fundamentar el análisis.
-            4. Redacta un diagnóstico general en español con estas secciones:
+            4. Redacta un diagnóstico general en español. Todo el comentario debe estar en formato
+               Markdown compatible con GitHub (GitHub Flavored Markdown): usa encabezados, listas,
+               negritas y bloques de código con la sintaxis correcta para que GitHub lo renderice bien.
+               Debe incluir estas secciones:
                - **Resumen**: qué reporta/pide el issue en 1-2 frases.
                - **Clasificación**: tipo (bug, mejora, pregunta, etc.) y labels asignados.
                - **Análisis técnico**: causa probable o área afectada, con referencias concretas
