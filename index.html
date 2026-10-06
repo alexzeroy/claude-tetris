@@ -21,22 +21,56 @@
       <canvas id="board" width="300" height="600"></canvas>
 
       <aside class="panel">
-        <div class="panel-section">
-          <span class="label">SCORE</span>
-          <span class="value" id="score">0</span>
+        <div class="stats-grid">
+          <div class="panel-section">
+            <span class="label">SCORE</span>
+            <span class="value" id="score">0</span>
+          </div>
+          <div class="panel-section">
+            <span class="label">COMBO</span>
+            <span class="value" id="combo">–</span>
+          </div>
+          <div class="panel-section">
+            <span class="label">LINES</span>
+            <span class="value" id="lines">0</span>
+          </div>
+          <div class="panel-section">
+            <span class="label">LEVEL</span>
+            <span class="value" id="level">1</span>
+          </div>
         </div>
+
         <div class="panel-section">
-          <span class="label">LINES</span>
-          <span class="value" id="lines">0</span>
-        </div>
-        <div class="panel-section">
-          <span class="label">LEVEL</span>
-          <span class="value" id="level">1</span>
+          <span class="label">HOLD <kbd>C</kbd></span>
+          <canvas id="hold-canvas" width="120" height="90"></canvas>
         </div>
 
         <div class="panel-section">
           <span class="label">NEXT</span>
-          <canvas id="next-canvas" width="120" height="120"></canvas>
+          <canvas id="next-canvas" width="120" height="90"></canvas>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">ENERGÍA <span id="energy-hint" class="hidden">· pulsa E</span></span>
+          <div class="energy-track" id="energy-track">
+            <div class="energy-fill" id="energy-fill"></div>
+          </div>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">MODO</span>
+          <select id="mode-select">
+            <option value="normal">Normal</option>
+            <option value="sprint">Sprint: 40 líneas / 2 min</option>
+            <option value="basura">Basura creciente</option>
+            <option value="obstaculos">Obstáculos</option>
+            <option value="invisible">Invisible</option>
+            <option value="inversa">Rotación inversa</option>
+          </select>
+        </div>
+
+        <div class="panel-section">
+          <span class="label objective" id="objective"></span>
         </div>
 
         <div class="panel-section controls">
@@ -46,6 +80,8 @@
             <li><kbd>↑</kbd> rotar</li>
             <li><kbd>↓</kbd> bajar</li>
             <li><kbd>Space</kbd> caída</li>
+            <li><kbd>C</kbd> reservar</li>
+            <li><kbd>E</kbd> habilidad</li>
             <li><kbd>P</kbd> pausa</li>
           </ul>
         </div>
@@ -57,6 +93,17 @@
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
         <button id="restart-btn">Reiniciar</button>
+      </div>
+    </div>
+
+    <div id="ability-menu" class="overlay hidden">
+      <div class="overlay-box ability-box">
+        <p class="ability-title">HABILIDAD</p>
+        <button data-ability="reveal">👁 Ver siguientes 5 piezas (20 s)</button>
+        <button data-ability="swap">🔄 Cambiar pieza actual</button>
+        <button data-ability="slow">🐢 Ralentizar tiempo (10 s)</button>
+        <button data-ability="undo">↩️ Deshacer última colocación</button>
+        <button id="ability-cancel">Cancelar</button>
       </div>
     </div>
   </div>

@@ -19,7 +19,7 @@ Three-file vanilla JavaScript app using the HTML5 Canvas API:
 
 - **`index.html`** — DOM structure with two `<canvas>` elements: `#board` (300×600px, main grid) and `#next-canvas` (120×120px, piece preview), plus score/level display and a pause/game-over overlay.
 - **`style.css`** — Dark arcade theme, flexbox layout.
-- **`game.js`** — All game logic (~300 lines).
+- **`game.js`** — All game logic (~700 lines).
 
 ### game.js internals
 
@@ -36,6 +36,16 @@ Three-file vanilla JavaScript app using the HTML5 Canvas API:
 **Game states:** `paused` (halts loop, shows overlay) and `gameOver` (triggered when a spawned piece immediately collides).
 
 **Temas:** oscuro por defecto; `#theme-toggle` alterna `data-theme="light"` en `<html>` y guarda la elección en `localStorage`. Los colores viven como variables CSS en `:root` (`style.css`); `drawGrid()` lee `--grid` y `applyTheme()` redibuja el canvas (necesario en pausa/game over).
+
+**Cola y hold:** `nextQueue` (5 piezas, `refillQueue()`); hold con C/Shift (`doHold()`, un uso por pieza vía `holdUsed`), slot `#hold-canvas`.
+
+**Piezas especiales:** pentominós +/U/Y (índices 8–10, 8% de probabilidad), anillo 3×3 (12, 2%), single 1×1 (11, recompensa tras un Tetris). Power-up cada 7 líneas (`makePowerPiece()`, bloque 1×1 dorado índice 14 con emoji): bomba 3×3, rayo fila+columna, tinte (elimina el color más abundante), gravedad (compacta huecos), congelar 5s (`freezeUntil`).
+
+**Combos:** `combo` multiplica la puntuación de línea en limpiezas consecutivas; bonus T-spin (`tSpinCorners()`), B2B (`b2b`), Perfect Clear. Efectos: `floatingTexts`/`flashRows` en canvas + beeps WebAudio (`beep()`).
+
+**Habilidades:** barra de energía (+1/línea, máx. 10); con E se abre `#ability-menu`: revelar 5 siguientes, cambiar pieza, ralentizar 10s (`slowUntil`), deshacer último lock (`undoSnapshot` con `structuredClone`).
+
+**Modos** (`#mode-select`, reinicia con `init()`): normal, sprint (40 líneas/2 min, `timeLeft`), basura (fila gris cada 10s, `addGarbageRow()`), obstáculos (`placeObstacles()`), invisible (`boardRevealUntil`), inversa (rotación CCW desde nivel 3).
 
 ### Key constants (top of game.js)
 
