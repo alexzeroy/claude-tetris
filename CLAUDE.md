@@ -35,6 +35,8 @@ Three-file vanilla JavaScript app using the HTML5 Canvas API:
 
 **Game states:** `paused` (halts loop, shows overlay) and `gameOver` (triggered when a spawned piece immediately collides).
 
+**Temas:** oscuro por defecto; `#theme-toggle` alterna `data-theme="light"` en `<html>` y guarda la elección en `localStorage`. Los colores viven como variables CSS en `:root` (`style.css`); `drawGrid()` lee `--grid` y `applyTheme()` redibuja el canvas (necesario en pausa/game over).
+
 ### Key constants (top of game.js)
 
 | Constant | Default | Notes |
