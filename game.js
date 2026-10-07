@@ -68,6 +68,12 @@ const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
 const restartBtn = document.getElementById('restart-btn');
+const pauseMenu = document.getElementById('pause-menu');
+const resumeBtn = document.getElementById('resume-btn');
+const pauseRestartBtn = document.getElementById('pause-restart-btn');
+const controlsBtn = document.getElementById('controls-btn');
+const controlsList = document.getElementById('controls-list');
+const startLevelSelect = document.getElementById('start-level-select');
 const abilityMenu = document.getElementById('ability-menu');
 const abilityCancel = document.getElementById('ability-cancel');
 const themeToggle = document.getElementById('theme-toggle');
@@ -81,6 +87,15 @@ let nextPowerupAt, undoSnapshot;
 let freezeUntil, slowUntil, revealQueueUntil, queueRevealed, boardRevealUntil;
 let lastMoveWasRotation;
 let floatingTexts, flashRows;
+
+// Nivel con el que empieza la próxima partida (configurable en el menú de pausa)
+let startLevel = 1;
+// Nivel inicial de la partida EN CURSO (cambiar el selector no afecta a la actual)
+let gameStartLevel = 1;
+try {
+  const saved = parseInt(localStorage.getItem('tetris.startLevel'), 10);
+  if (saved >= 1 && saved <= 10) startLevel = saved;
+} catch (e) {}
 
 /* ---------- Audio (WebAudio, sin assets) ---------- */
 
@@ -254,7 +269,7 @@ function scoreClears(cleared, tSpin) {
       beep(660, 0.12);
     }
 
-    level = Math.floor(lines / 10) + 1;
+    level = Math.max(gameStartLevel, Math.floor(lines / 10) + 1);
     dropInterval = Math.max(100, 1000 - (level - 1) * 90);
     beep(440 + cleared * 110, 0.1);
 
@@ -688,6 +703,8 @@ function finishGame(title) {
   abilityMenu.classList.add('hidden');
   overlayTitle.textContent = title;
   overlayScore.textContent = `Puntuación: ${score.toLocaleString()}`;
+  pauseMenu.classList.add('hidden');
+  restartBtn.classList.remove('hidden');
   overlay.classList.remove('hidden');
 }
 
@@ -701,12 +718,17 @@ function togglePause() {
   paused = !paused;
   if (!paused) {
     overlay.classList.add('hidden');
+    pauseMenu.classList.add('hidden');
+    restartBtn.classList.remove('hidden');
     lastTime = performance.now();
     animId = requestAnimationFrame(loop);
   } else {
     cancelAnimationFrame(animId);
     overlayTitle.textContent = 'PAUSA';
     overlayScore.textContent = '';
+    restartBtn.classList.add('hidden');
+    controlsList.classList.add('hidden'); // el menú siempre abre con la lista colapsada
+    pauseMenu.classList.remove('hidden');
     overlay.classList.remove('hidden');
   }
 }
@@ -773,7 +795,8 @@ function init() {
   if (mode === 'obstaculos') placeObstacles();
   score = 0;
   lines = 0;
-  level = 1;
+  gameStartLevel = startLevel;
+  level = gameStartLevel;
   combo = 0;
   b2b = false;
   energy = 0;
@@ -783,7 +806,7 @@ function init() {
   paused = false;
   gameOver = false;
   abilityOpen = false;
-  dropInterval = 1000;
+  dropInterval = Math.max(100, 1000 - (gameStartLevel - 1) * 90);
   dropAccum = 0;
   nextPowerupAt = POWER_EVERY;
   freezeUntil = 0;
@@ -803,6 +826,8 @@ function init() {
   updateHUD();
   updateObjective(performance.now());
   overlay.classList.add('hidden');
+  pauseMenu.classList.add('hidden');
+  restartBtn.classList.remove('hidden');
   abilityMenu.classList.add('hidden');
   cancelAnimationFrame(animId);
   lastTime = performance.now();
@@ -816,8 +841,17 @@ document.addEventListener('keydown', e => {
     if (e.code === 'Escape') closeAbilityMenu();
     return;
   }
-  if (e.code === 'KeyP') { togglePause(); return; }
-  if (paused || gameOver) return;
+  if (paused) {
+    // menú de pausa abierto: bloquear inputs del juego; solo P/Escape reanudan
+    if (e.code === 'Space' || e.code === 'ArrowLeft' || e.code === 'ArrowRight' ||
+        e.code === 'ArrowUp' || e.code === 'ArrowDown') {
+      e.preventDefault(); // evita activar botones/selects enfocados del menú
+    }
+    if (e.code === 'KeyP' || e.code === 'Escape') togglePause();
+    return;
+  }
+  if (e.code === 'KeyP' || e.code === 'Escape') { togglePause(); return; }
+  if (gameOver) return;
   switch (e.code) {
     case 'ArrowLeft':
       if (!collide(current.shape, current.x - 1, current.y)) {
@@ -855,6 +889,32 @@ document.addEventListener('keydown', e => {
 });
 
 restartBtn.addEventListener('click', init);
+
+/* ---------- Menú de pausa ---------- */
+
+resumeBtn.addEventListener('click', () => {
+  resumeBtn.blur();
+  togglePause();
+});
+
+pauseRestartBtn.addEventListener('click', () => {
+  pauseRestartBtn.blur();
+  init();
+});
+
+controlsBtn.addEventListener('click', () => {
+  controlsList.classList.toggle('hidden');
+  controlsBtn.blur();
+});
+
+startLevelSelect.addEventListener('change', () => {
+  const val = parseInt(startLevelSelect.value, 10);
+  if (val >= 1 && val <= 10) startLevel = val;
+  try { localStorage.setItem('tetris.startLevel', String(startLevel)); } catch (e) {}
+  startLevelSelect.blur();
+});
+
+startLevelSelect.value = String(startLevel);
 
 modeSelect.addEventListener('change', () => {
   modeSelect.blur(); // evita que las flechas cambien el modo durante la partida

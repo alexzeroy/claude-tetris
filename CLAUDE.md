@@ -25,7 +25,7 @@ Three-file vanilla JavaScript app using the HTML5 Canvas API:
 
 **Board state:** a 20×10 matrix where `0` = empty, `1–7` = piece color index.
 
-**Game loop:** `requestAnimationFrame`-based. A `dropAccum` timer advances each frame; when it exceeds `dropInterval` (starts at 1000ms, shrinks 90ms per level, min 100ms), the active piece drops one row.
+**Game loop:** `requestAnimationFrame`-based. A `dropAccum` timer advances each frame; when it exceeds `dropInterval` (starts at `1000 - (startLevel-1)*90` ms, shrinks 90ms per level, min 100ms), the active piece drops one row.
 
 **Rotation:** clockwise via matrix transpose + row reversal. `tryRotate()` implements wall kicks by attempting ±1 and ±2 column offsets on collision.
 
@@ -34,6 +34,8 @@ Three-file vanilla JavaScript app using the HTML5 Canvas API:
 **Ghost piece:** calculated by projecting the active piece downward until collision; rendered at 0.2 alpha.
 
 **Game states:** `paused` (halts loop, shows overlay) and `gameOver` (triggered when a spawned piece immediately collides).
+
+**Menú de pausa:** P o Escape alternan la pausa (`togglePause()`), que muestra el sub-panel `#pause-menu` dentro del overlay compartido: Reanudar, Reiniciar (`init()`), Ver controles (lista desplegable `#controls-list`) y selector de nivel inicial 1–10 (`#start-level-select` → `startLevel`, persistido en `localStorage` como `tetris.startLevel`; se aplica a la próxima partida — la partida en curso usa `gameStartLevel`, capturado en `init()`, y el nivel sube con `Math.max(gameStartLevel, floor(lines/10)+1)`). Con el menú abierto los inputs del juego quedan bloqueados (solo P/Escape; flechas/Espacio hacen `preventDefault`).
 
 **Temas:** oscuro por defecto; `#theme-toggle` alterna `data-theme="light"` en `<html>` y guarda la elección en `localStorage`. Los colores viven como variables CSS en `:root` (`style.css`); `drawGrid()` lee `--grid` y `applyTheme()` redibuja el canvas (necesario en pausa/game over).
 

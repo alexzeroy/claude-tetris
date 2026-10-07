@@ -93,6 +93,37 @@
         <p id="overlay-title">GAME OVER</p>
         <p id="overlay-score"></p>
         <button id="restart-btn">Reiniciar</button>
+
+        <div id="pause-menu" class="pause-menu hidden">
+          <button id="resume-btn">Reanudar</button>
+          <button id="pause-restart-btn">Reiniciar</button>
+          <button id="controls-btn">Ver controles</button>
+          <ul id="controls-list" class="controls-list hidden">
+            <li><kbd>←</kbd><kbd>→</kbd> mover</li>
+            <li><kbd>↓</kbd> caída suave</li>
+            <li><kbd>↑</kbd>/<kbd>X</kbd> rotar</li>
+            <li><kbd>Espacio</kbd> caída dura</li>
+            <li><kbd>C</kbd>/<kbd>Shift</kbd> reservar</li>
+            <li><kbd>E</kbd> habilidades</li>
+            <li><kbd>P</kbd>/<kbd>Esc</kbd> pausa</li>
+          </ul>
+          <div class="start-level">
+            <label for="start-level-select">Nivel inicial</label>
+            <select id="start-level-select">
+              <option value="1">1</option>
+              <option value="2">2</option>
+              <option value="3">3</option>
+              <option value="4">4</option>
+              <option value="5">5</option>
+              <option value="6">6</option>
+              <option value="7">7</option>
+              <option value="8">8</option>
+              <option value="9">9</option>
+              <option value="10">10</option>
+            </select>
+            <span class="start-level-hint">Se aplica a la próxima partida</span>
+          </div>
+        </div>
       </div>
     </div>
 
