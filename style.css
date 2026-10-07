@@ -309,3 +309,143 @@ kbd {
 #theme-toggle:hover {
   border-color: var(--accent);
 }
+
+/* ---- Tabla de records ---- */
+#records-panel {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+/* .hidden pierde contra la especificidad de ID de sus reglas display:flex */
+#records-panel.hidden,
+#record-entry.hidden {
+  display: none;
+}
+
+.records-title {
+  font-size: 11px;
+  letter-spacing: 3px;
+  color: var(--label);
+  font-weight: 700;
+}
+
+#records-table {
+  border-collapse: collapse;
+  font-family: 'Courier New', Courier, monospace;
+  font-size: 13px;
+}
+
+#records-table th {
+  font-size: 10px;
+  letter-spacing: 1px;
+  color: var(--label);
+  padding: 3px 9px;
+  text-align: left;
+  border-bottom: 1px solid var(--border);
+}
+
+#records-table td {
+  padding: 4px 9px;
+  color: var(--text);
+  text-align: left;
+}
+
+#records-table th:nth-child(n+3),
+#records-table td:nth-child(n+3) {
+  text-align: right;
+}
+
+#records-table tr.record-new td {
+  color: var(--accent);
+  font-weight: 700;
+  background: var(--accent-glow);
+}
+
+.records-empty {
+  color: var(--muted);
+  font-size: 13px;
+}
+
+#record-entry {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  align-items: center;
+}
+
+.record-entry-label {
+  font-size: 13px;
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.record-entry-row {
+  display: flex;
+  gap: 8px;
+}
+
+#record-name {
+  background: var(--surface);
+  color: var(--text);
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  padding: 6px 10px;
+  font-size: 14px;
+  font-family: 'Courier New', Courier, monospace;
+  width: 140px;
+  text-transform: uppercase;
+  user-select: text;
+}
+
+#record-name:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+#record-save,
+#play-btn {
+  background: var(--accent);
+  color: var(--bg);
+  border: none;
+  border-radius: 6px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background 0.15s;
+}
+
+#record-save {
+  padding: 6px 14px;
+  font-size: 13px;
+}
+
+#play-btn {
+  padding: 10px 28px;
+  font-size: 14px;
+  letter-spacing: 1px;
+}
+
+#record-save:hover,
+#play-btn:hover {
+  background: var(--accent-hover);
+}
+
+#records-reset {
+  background: none;
+  border: none;
+  color: var(--muted);
+  font-size: 11px;
+  cursor: pointer;
+  text-decoration: underline;
+  padding: 2px 6px;
+}
+
+#records-reset:hover {
+  color: var(--danger);
+}
+
+#overlay-title.start {
+  color: var(--accent);
+}
