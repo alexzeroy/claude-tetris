@@ -22,6 +22,56 @@ const COLORS = [
   '#ffd700', // 14 power-up
 ];
 
+/* ---------- Skins ---------- */
+
+// Paleta + estilo de render por skin; el render se aplica en drawBlockPx().
+const SKINS = {
+  retro: { style: 'retro', colors: COLORS },
+  neon: {
+    style: 'neon',
+    colors: [
+      null,
+      '#00f0ff', // 1 I
+      '#ffe600', // 2 O
+      '#d400ff', // 3 T
+      '#00ff66', // 4 S
+      '#ff2957', // 5 Z
+      '#2979ff', // 6 J
+      '#ff9100', // 7 L
+      '#ff4dd2', // 8 pentominó +
+      '#00ffc8', // 9 pentominó U
+      '#d4ff00', // 10 pentominó Y
+      '#ffffff', // 11 single
+      '#ff6d00', // 12 anillo
+      '#8a93a5', // 13 basura
+      '#ffd700', // 14 power-up
+    ],
+  },
+  pastel: {
+    style: 'pastel',
+    colors: [
+      null,
+      '#a8dadc', // 1 I
+      '#ffe5a0', // 2 O
+      '#d8b4e2', // 3 T
+      '#b5e5b5', // 4 S
+      '#f4b6b6', // 5 Z
+      '#b8d4f0', // 6 J
+      '#ffd3a8', // 7 L
+      '#f7c2d7', // 8 pentominó +
+      '#aed9d4', // 9 pentominó U
+      '#e8eec0', // 10 pentominó Y
+      '#ffffff', // 11 single
+      '#cbb8ae', // 12 anillo
+      '#aab4bc', // 13 basura
+      '#ffe08a', // 14 power-up
+    ],
+  },
+  pixel: { style: 'pixel', colors: COLORS },
+};
+
+let currentSkin = 'retro';
+
 const PIECES = [
   null,
   [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]], // I
@@ -64,6 +114,7 @@ const energyTrack = document.getElementById('energy-track');
 const energyHint = document.getElementById('energy-hint');
 const objectiveEl = document.getElementById('objective');
 const modeSelect = document.getElementById('mode-select');
+const skinSelect = document.getElementById('skin-select');
 const overlay = document.getElementById('overlay');
 const overlayTitle = document.getElementById('overlay-title');
 const overlayScore = document.getElementById('overlay-score');
@@ -560,14 +611,87 @@ function updateFloatingTexts(dt) {
 
 /* ---------- Dibujo ---------- */
 
+// aclara (f > 0) u oscurece (f < 0) un color '#rrggbb'
+function shadeColor(hex, f) {
+  const n = parseInt(hex.slice(1), 16);
+  let r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+  if (f >= 0) {
+    r += (255 - r) * f; g += (255 - g) * f; b += (255 - b) * f;
+  } else {
+    r *= 1 + f; g *= 1 + f; b *= 1 + f;
+  }
+  return `rgb(${Math.round(r)},${Math.round(g)},${Math.round(b)})`;
+}
+
+// patrones 3×3 precalculados por color base para la skin pixel art
+const pixelPatternCache = {};
+
+function pixelShades(base) {
+  let p = pixelPatternCache[base];
+  if (!p) {
+    const L = shadeColor(base, 0.35);
+    const D = shadeColor(base, -0.3);
+    p = [[L, L, base], [L, base, D], [base, D, D]];
+    pixelPatternCache[base] = p;
+  }
+  return p;
+}
+
 function drawBlockPx(context, px, py, colorIndex, size, alpha) {
   if (!colorIndex) return;
+  const sk = SKINS[currentSkin] || SKINS.retro;
+  const color = sk.colors[colorIndex] || COLORS[colorIndex];
   context.globalAlpha = alpha ?? 1;
-  context.fillStyle = COLORS[colorIndex];
-  context.fillRect(px + 1, py + 1, size - 2, size - 2);
-  // highlight
-  context.fillStyle = 'rgba(255,255,255,0.12)';
-  context.fillRect(px + 1, py + 1, size - 2, Math.max(2, size * 0.13));
+
+  switch (sk.style) {
+    case 'neon': {
+      context.fillStyle = color;
+      context.shadowColor = color;
+      context.shadowBlur = size * 0.4;
+      context.fillRect(px + 2, py + 2, size - 4, size - 4);
+      context.shadowBlur = 0; // resetear SIEMPRE: shadow es caro y contamina otros draws
+      context.strokeStyle = 'rgba(255,255,255,0.65)';
+      context.lineWidth = 1;
+      context.strokeRect(px + 2.5, py + 2.5, size - 5, size - 5);
+      break;
+    }
+    case 'pastel': {
+      context.fillStyle = color;
+      if (context.roundRect) {
+        const rad = Math.max(3, size * 0.25);
+        context.beginPath();
+        context.roundRect(px + 1.5, py + 1.5, size - 3, size - 3, rad);
+        context.fill();
+        // brillo superior suave
+        context.fillStyle = 'rgba(255,255,255,0.3)';
+        context.beginPath();
+        context.roundRect(px + 4, py + 4, size - 8, (size - 8) * 0.38, rad * 0.5);
+        context.fill();
+      } else {
+        context.fillRect(px + 1, py + 1, size - 2, size - 2);
+      }
+      break;
+    }
+    case 'pixel': {
+      const pat = pixelShades(color);
+      const x0 = px + 1, y0 = py + 1, w = size - 2;
+      for (let r = 0; r < 3; r++)
+        for (let c = 0; c < 3; c++) {
+          const sx = x0 + Math.round((w * c) / 3);
+          const sy = y0 + Math.round((w * r) / 3);
+          context.fillStyle = pat[r][c];
+          context.fillRect(sx, sy, x0 + Math.round((w * (c + 1)) / 3) - sx, y0 + Math.round((w * (r + 1)) / 3) - sy);
+        }
+      break;
+    }
+    default: {
+      context.fillStyle = color;
+      context.fillRect(px + 1, py + 1, size - 2, size - 2);
+      // highlight
+      context.fillStyle = 'rgba(255,255,255,0.12)';
+      context.fillRect(px + 1, py + 1, size - 2, Math.max(2, size * 0.13));
+    }
+  }
   context.globalAlpha = 1;
 }
 
@@ -887,5 +1011,27 @@ themeToggle.addEventListener('click', () => {
   themeToggle.blur(); // evita que Space active el botón durante la partida
 });
 
+/* ---------- Skin ---------- */
+
+function applySkin(name) {
+  if (!SKINS[name]) name = 'retro';
+  currentSkin = name;
+  if (name === 'retro') delete document.documentElement.dataset.skin;
+  else document.documentElement.dataset.skin = name;
+  if (skinSelect.value !== name) skinSelect.value = name;
+  try { localStorage.setItem('tetris.skin', name); } catch (e) {}
+  // el bucle no corre en pausa/game over: redibujar para aplicar la skin
+  if (current) { draw(); drawNext(); drawHold(); }
+}
+
+skinSelect.addEventListener('change', () => {
+  skinSelect.blur(); // evita que Space/flechas cambien la skin durante la partida
+  applySkin(skinSelect.value);
+});
+
+let savedSkin = 'retro';
+try { savedSkin = localStorage.getItem('tetris.skin') || 'retro'; } catch (e) {}
+
 applyTheme(document.documentElement.dataset.theme === 'light' ? 'light' : 'dark');
+applySkin(savedSkin);
 init();

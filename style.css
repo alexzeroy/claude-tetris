@@ -159,8 +159,9 @@ body {
   display: none;
 }
 
-/* ---- Selector de modo ---- */
-#mode-select {
+/* ---- Selectores de modo y skin ---- */
+#mode-select,
+#skin-select {
   background: var(--surface);
   color: var(--text);
   border: 1px solid var(--border);
@@ -171,7 +172,8 @@ body {
   width: 100%;
 }
 
-#mode-select:hover {
+#mode-select:hover,
+#skin-select:hover {
   border-color: var(--accent);
 }
 
@@ -308,4 +310,25 @@ kbd {
 
 #theme-toggle:hover {
   border-color: var(--accent);
+}
+
+/* ---- Skins (conviven con data-theme; neon impone tablero oscuro) ---- */
+:root[data-skin="neon"],
+:root[data-theme="light"][data-skin="neon"] {
+  --grid: #16162e;
+}
+
+:root[data-skin="neon"] #board,
+:root[data-skin="neon"] #next-canvas,
+:root[data-skin="neon"] #hold-canvas {
+  background: #000008;
+  border-color: #2b2b55;
+}
+
+:root[data-skin="pastel"] {
+  --grid: #2e2e40;
+}
+
+:root[data-theme="light"][data-skin="pastel"] {
+  --grid: #eceef5;
 }

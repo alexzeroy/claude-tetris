@@ -5,9 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tetris</title>
   <script>
-    try {
-      if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light';
-    } catch (e) {}
+    (function () {
+      try {
+        if (localStorage.getItem('theme') === 'light') document.documentElement.dataset.theme = 'light';
+        // un data-skin desconocido no matchea ningún CSS y game.js lo normaliza después
+        var skin = localStorage.getItem('tetris.skin');
+        if (skin && skin !== 'retro') document.documentElement.dataset.skin = skin;
+      } catch (e) {}
+    })();
   </script>
   <link rel="stylesheet" href="style.css" />
 </head>
@@ -66,6 +71,16 @@
             <option value="obstaculos">Obstáculos</option>
             <option value="invisible">Invisible</option>
             <option value="inversa">Rotación inversa</option>
+          </select>
+        </div>
+
+        <div class="panel-section">
+          <span class="label">SKIN</span>
+          <select id="skin-select">
+            <option value="retro">Retro</option>
+            <option value="neon">Neón</option>
+            <option value="pastel">Pastel</option>
+            <option value="pixel">Pixel art</option>
           </select>
         </div>
 
